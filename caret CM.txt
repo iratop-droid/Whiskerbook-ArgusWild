@@ -1,0 +1,66 @@
+if (!require('tidyverse')) install.packages('tidyverse'); library('tidyverse')
+if (!require('janitor')) install.packages('janitor'); library('janitor')
+if (!require('writexl')) install.packages('writexl'); library('writexl')
+if (!require('stringi')) install.packages('stringi'); library('stringi')
+if (!require('fuzzyjoin')) install.packages('fuzzyjoin'); library('fuzzyjoin')
+if (!require('sf')) install.packages('sf'); library('sf')
+if (!require('tools')) install.packages('tools'); library('tools')
+if (!require('Metrics')) install.packages('Metrics'); library('Metrics')
+if (!require('PRROC')) install.packages('PRROC'); library('PRROC')
+library(stringr)
+install.packages("caret")
+install.packages("Metrics")
+library(ggplot2)
+
+##Mydata using caret package
+setwd(dirname(file.choose()))
+
+export_PC <- read_csv(file = file.choose())
+# View the first few rows of the data to understand its structure
+head(export_PC)
+
+##dvije vrijednosti lynx ili none 
+#ako je FP onda u actual pisati none jer time prepoznaje da se radi o false positivu.
+#ako je FN onda normalno - pisati u actual lynx, a u predicted none
+#TP je lynx u obje kolone
+# Extract the actual and predicted columns from your data
+actual <- export_PC$actual   # Replace 'actual' with the correct column name in your CSV file
+predicted <- export_PC$predictive   # Replace 'predicted' with the correct column name in your CSV file
+
+# Convert these columns to factors (important for caret's confusionMatrix function)
+actual <- factor(actual)
+predicted <- factor(predicted)
+
+# Create confusion matrix
+conf_matrix_caret <- confusionMatrix(predicted, actual)
+
+# Print the confusion matrix
+print(conf_matrix_caret)
+
+##My data VISUALISED using PRROC package
+#PROVJERITI X I Y VRIJEDNOSTI
+setwd(dirname(file.choose()))
+
+export_CMN <- read_csv(file = file.choose())
+# View the first few rows of the data to understand its structure
+head(export_CMN)
+
+
+### ** Examples
+# create artificial scores as random numbers
+x <- export_CMN$predictive
+y <- export_CMN$actual;
+# compute area under PR curve for the hard-labeled case
+pr <- pr.curve( x, y );
+print( pr );
+Precision-recall curve
+Area under curve (Integral):
+  0.7454333 
+Area under curve (Davis & Goadrich):
+  0.7454322 
+Curve not computed ( can be done by using curve=TRUE )
+# compute PR curve and area under curve
+pr <- pr.curve( x, y, curve = TRUE );
+# plot curve
+plot(pr);
+
